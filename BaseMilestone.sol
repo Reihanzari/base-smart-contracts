@@ -41,3 +41,11 @@ contract BaseMilestone {
         return milestones[user].length;
     }
 }
+function milestoneCount(address user)
+        external
+        view
+        returns (uint256)
+    {
+        return milestones[user].length;
+    }
+}
