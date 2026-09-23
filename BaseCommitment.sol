@@ -36,3 +36,7 @@ contract BaseCommitment {
         return (c.hash, c.createdAt, c.revealed);
     }
 }
+  Commitment memory c = commitments[user];
+        return (c.hash, c.createdAt, c.revealed);
+    }
+}
