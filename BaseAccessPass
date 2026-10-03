@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+
+contract BaseAccessPass {
+
+    mapping(address => uint256) public expiresAt;
+
+    event PassActivated(
+        address indexed user,
+        uint256 expiresAt
+    );
+
+    event PassCancelled(
+        address indexed user,
+        uint256 timestamp
+    );
+
+    function activatePass(
+        uint256 durationSeconds
+    ) external {
+        require(
+            durationSeconds > 0,
+            "Invalid duration"
+        );
+
+        require(
+            durationSeconds <= 365 days,
+            "Maximum 365 days"
+        );
+
+        uint256 startTime = block.timestamp;
+
+        if (expiresAt[msg.sender] > block.timestamp) {
+            startTime = expiresAt[msg.sender];
+        }
+
+        expiresAt[msg.sender] = startTime + durationSeconds;
+
+        emit PassActivated(
+            msg.sender,
+            expiresAt[msg.sender]
+        );
+    }
+
+    function cancelPass() external {
+        require(
+            expiresAt[msg.sender] > block.timestamp,
+            "No active pass"
+        );
+
+        expiresAt[msg.sender] = block.timestamp;
+
+        emit PassCancelled(
+            msg.sender,
+            block.timestamp
+        );
+    }
+
+    function isActive(
+        address user
+    ) external view returns (bool) {
+        return expiresAt[user] > block.timestamp;
+    }
+
+    function remainingTime(
+        address user
+    ) external view returns (uint256) {
+        if (expiresAt[user] <= block.timestamp) {
+            return 0;
+        }
+
+        return expiresAt[user] - block.timestamp;
+    }
+}
